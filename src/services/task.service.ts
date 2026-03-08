@@ -30,3 +30,52 @@ export const getUserTasks = async (
     pages: Math.ceil(total / limit)
   };
 };
+
+
+
+
+
+// Update Task
+
+export const updateTask = async (
+  taskId: string,
+  userId: string,
+  updateData: any
+) => {
+
+  const task = await Task.findOne({
+    _id: taskId,
+    userId
+  });
+
+  if (!task) {
+    throw new Error("Task not found or not authorized");
+  }
+
+  Object.assign(task, updateData);
+
+  await task.save();
+
+  return task;
+};
+
+
+
+// Delete  TAsk
+
+export const deleteTask = async (
+  taskId: string,
+  userId: string
+) => {
+
+  const task = await Task.findOneAndDelete({
+    _id: taskId,
+    userId
+  });
+
+  if (!task) {
+    throw new Error("Task not found or not authorized");
+  }
+
+  return task;
+};

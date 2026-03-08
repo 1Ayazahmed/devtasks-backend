@@ -1,51 +1,52 @@
-import { Request, Response, NextFunction } from "express"
-import jwt from "jsonwebtoken"
-import { User } from "../models/user.model"
+import { Request, Response, NextFunction } from "express";
+import jwt from "jsonwebtoken";
+import { User } from "../models/user.model";
 
 interface JwtPayload {
-  userId: string
+  userId: string;
 }
 
 export const protect = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
-  let token
+  let token;
 
-  const authHeader = req.headers.authorization
+  const authHeader = req.headers.authorization;
 
   if (authHeader && authHeader.startsWith("Bearer")) {
-    token = authHeader.split(" ")[1]
+    token = authHeader.split(" ")[1];
   }
 
   if (!token) {
     return res.status(401).json({
-      message: "Not authorized, token missing"
-    })
+      message: "Not authorized, token missing",
+    });
   }
 
   try {
     const decoded = jwt.verify(
       token,
-      process.env.JWT_SECRET as string
-    ) as JwtPayload
+      process.env.JWT_SECRET as string,
+    ) as JwtPayload;
 
-    const user = await User.findById(decoded.userId)
+    const user = await User.findById(decoded.userId);
 
     if (!user) {
       return res.status(401).json({
-        message: "User not found"
-      })
+        message: "User not found",
+      });
     }
 
     // attach user to request
-    ;(req as any).user = user
+    // (req as any).user = user;
+    req.user = user;
 
-    next()
+    next();
   } catch (error) {
     return res.status(401).json({
-      message: "Invalid token"
-    })
+      message: "Invalid token",
+    });
   }
-}
+};
