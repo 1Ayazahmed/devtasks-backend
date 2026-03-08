@@ -4,15 +4,19 @@ import { createTask, getUserTasks } from "../services/task.service";
 import { updateTask } from "../services/task.service";
 import { deleteTask } from "../services/task.service";
 
+import { createTaskSchema } from "../validators/task.validator";
+
 
 
 export const createTaskController = asyncHandler(async (req: Request, res: Response) => {
-  const { title } = req.body;
+    const validatedData = createTaskSchema.parse(req.body);
+
+  // const { title } = req.body;
 
   // const user = (req as any).user;
   const user = req.user;
 
-  const task = await createTask(title, user._id);
+  const task = await createTask(  validatedData.title, user!._id);
 
   res.status(201).json({
     success: true,
@@ -65,7 +69,7 @@ export const updateTaskController = asyncHandler(async (req: Request, res: Respo
 
 
 
-export const deleteTaskController = asyncHandler(async (req, res) => {
+export const deleteTaskController = asyncHandler(async (req:Request, res:Response) => {
 
   const taskId = req.params.id;
 
