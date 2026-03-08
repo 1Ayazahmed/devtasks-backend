@@ -9,8 +9,24 @@ export const createTask = async (title: string, userId: string) => {
   return task;
 };
 
-export const getUserTasks = async (userId: string) => {
-  const tasks = await Task.find({ userId }).sort({ createdAt: -1 });
+export const getUserTasks = async (
+  userId: string,
+  page: number,
+  limit: number
+) => {
+  const skip = (page - 1) * limit;
 
-  return tasks;
+  const tasks = await Task.find({ userId })
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit);
+
+  const total = await Task.countDocuments({ userId });
+
+  return {
+    tasks,
+    total,
+    page,
+    pages: Math.ceil(total / limit)
+  };
 };

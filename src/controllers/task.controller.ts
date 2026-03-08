@@ -18,10 +18,18 @@ export const createTaskController = asyncHandler(async (req: Request, res: Respo
 export const getTasksController = asyncHandler(async (req: Request, res: Response) => {
   const user = (req as any).user;
 
-  const tasks = await getUserTasks(user._id);
+  const page = Number(req.query.page) || 1;
+  const limit = Number(req.query.limit) || 10;
+
+  const result = await getUserTasks(user._id, page, limit);
 
   res.status(200).json({
     success: true,
-    data: tasks
+    data: result.tasks,
+    pagination: {
+      total: result.total,
+      page: result.page,
+      pages: result.pages
+    }
   });
 });
